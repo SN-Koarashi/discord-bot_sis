@@ -1,0 +1,9 @@
+{
+  "token": "Your Bot TokenID",
+  "mysqlHost" : "localhost",
+  "mysqlUser" : "root",
+  "mysqlPass" : "",
+  "mysqlDB" : "database",
+  "version" : "v1.0.2",
+  "botAdminUserId" : "AdminID",
+}
