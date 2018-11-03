@@ -27,7 +27,7 @@ bot.on('message', message => {
   }
   if (message.content === '~check') {
 			var id = message.member.id;
-			db.query("SELECT date,day FROM user WHERE dis_id='"+id+"'",[],function(err,rows){
+			db.query("SELECT date,day FROM discord WHERE dis_id='"+id+"'",[],function(err,rows){
 				var obj = JSON.stringify(rows);
 				var obj = JSON.parse(obj);
 				if(obj[0] == null){
@@ -48,7 +48,7 @@ bot.on('message', message => {
 			var month = ('0'+(date.getMonth()*1+1)).substr(-2);
 			var day = ('0'+(date.getDate()*1-1)).substr(-2);
 			var now = year+'-'+month+'-'+day;
-			db.query("INSERT INTO user VALUES(NULL,'"+id+"','0','"+now+"')",[],function(err,rows){
+			db.query("INSERT INTO discord VALUES(NULL,'"+id+"','0','"+now+"')",[],function(err,rows){
 				var msg = JSON.stringify(err);
 				if(msg != 'null'){
 					var obj = JSON.parse(msg);
@@ -67,7 +67,7 @@ bot.on('message', message => {
 			var month = ('0'+(date.getMonth()*1+1)).substr(-2);
 			var day = ('0'+date.getDate()).substr(-2);
 			var now = year+'-'+month+'-'+day;
-			db.query("SELECT date,day FROM user WHERE dis_id='"+id+"'",[],function(err,rows){
+			db.query("SELECT date,day FROM discord WHERE dis_id='"+id+"'",[],function(err,rows){
 				var obj = JSON.stringify(rows);
 				var obj = JSON.parse(obj);
 				if(obj[0] == null){
@@ -82,7 +82,7 @@ bot.on('message', message => {
 						return false;
 					}
 					else{
-						db.query("UPDATE user SET day='"+(obj[0].day*1+1)+"',date='"+now+"' WHERE dis_id='"+id+"'",[],function(err,rows){
+						db.query("UPDATE discord SET day='"+(obj[0].day*1+1)+"',date='"+now+"' WHERE dis_id='"+id+"'",[],function(err,rows){
 							console.log('[INFO] UpdateDB: '+id+' sign in '+(obj[0].day*1+1)+' days successfuly');
 							message.reply('簽到成功,您已經簽到 '+(obj[0].day*1+1)+' 天');
 							return false;
@@ -94,4 +94,3 @@ bot.on('message', message => {
 });
 // Log our bot in using the token from https://discordapp.com/developers/applications/me
 bot.login(config.token);
-
