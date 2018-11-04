@@ -12,7 +12,7 @@ A simple Discord Bot, let all of member to sign in for everyday!
 
 **Node.js 6.0.0 or newer is required.**
 
-Besides, Installation required module is done using the "npm install" command:
+Besides, installation required module is done using the "npm install" command:
 
 `npm install discord.js`
 
