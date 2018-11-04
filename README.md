@@ -4,7 +4,7 @@ A simple Discord Bot, let all of member to sign in for everyday!
 
 簡單的簽到系統，可讓會員們在你的伺服器進行每日簽到。
 
-##Installation
+## Installation
 
 **需要 NodeJS 6.0.0 或更高的版本**
 
