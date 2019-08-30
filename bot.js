@@ -16,14 +16,12 @@ bot.on('ready', () => {
 
 // Create an event listener for messages
 bot.on('message', message => {
-  if (message.channel.type != 'text') {
-        return;
-  }
+  if (message.channel.type != 'text') return;
   if (message.content === '~getid') {
-	message.author.send("你的用戶ID: "+message.member.id);
+	message.author.send("Your ID: "+message.member.id);
   }
   if (message.content === '~help') {
-    message.channel.send("歡迎使用天夜之心Discord簽到系統\n若您還未建立帳戶 輸入 `~create` 建立您的帳戶\n查看簽到天數請輸入 `~check`\n進行簽到請輸入 `~sign`\n\n"+config.version);
+    message.channel.send("Welcome to our Sign System!\nIf you cannot create account, please type `~create` to do it.\nView your sign in days `~check`\nSign in `~sign`\n\n"+config.version);
   }
   if (message.content === '~check') {
 			var id = message.member.id;
@@ -32,12 +30,12 @@ bot.on('message', message => {
 				var obj = JSON.parse(obj);
 				if(obj[0] == null){
 					console.log('[INFO] CheckDB: '+id+' not create a account');
-					message.reply('尚未建立帳戶');
+					message.reply('You have not create account.');
 					return false;
 				}
 				else{
 					console.log('[INFO] CheckDB: '+id+' check sign in day on '+obj[0].day+' days, last sign in date: '+obj[0].date);
-					message.reply('您已經簽到 '+obj[0].day+' 天，上次簽到日期是 '+obj[0].date);
+					message.reply('Sign in Information\nSign in Total: '+obj[0].day+' days\nLast Sign in Date: '+obj[0].date);
 				}
 			});
   }
@@ -53,11 +51,11 @@ bot.on('message', message => {
 				if(msg != 'null'){
 					var obj = JSON.parse(msg);
 					console.log('[WARN] Create faild: '+id+'('+obj.errno+')');
-					message.reply('你已經建立帳號了');
+					message.reply('You already have account.');
 					return false;
 				}
 				console.log('[INFO] Success create at:'+id);
-				message.reply('帳戶建立成功!');
+				message.reply('Account create successfuly!');
 			});
   }
   if (message.content === '~sign') {
@@ -72,19 +70,19 @@ bot.on('message', message => {
 				var obj = JSON.parse(obj);
 				if(obj[0] == null){
 					console.log('[INFO] UpdateDB: '+id+' not create a account');
-					message.reply('尚未建立帳戶');
+					message.reply('You have not create account.');
 					return false;
 				}
 				else{
 					if(obj[0].date == now){
 						console.log('[INFO] UpdateDB: '+id+' sign in failed');
-						message.reply('今天已經簽到過了');
+						message.reply('You already have sign in today.');
 						return false;
 					}
 					else{
 						db.query("UPDATE discord SET day='"+(obj[0].day*1+1)+"',date='"+now+"' WHERE dis_id='"+id+"'",[],function(err,rows){
 							console.log('[INFO] UpdateDB: '+id+' sign in '+(obj[0].day*1+1)+' days successfuly');
-							message.reply('簽到成功,您已經簽到 '+(obj[0].day*1+1)+' 天');
+							message.reply('Sign in successfuly! You has been signed in '+(obj[0].day*1+1)+' days.');
 							return false;
 						});
 					}
