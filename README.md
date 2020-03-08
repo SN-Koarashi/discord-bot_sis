@@ -17,7 +17,7 @@ File `db.sql` is the table settings, you need to import it to your database.
 ### 關於
 簡單的簽到系統，可讓會員們在你的伺服器進行每日簽到。
 
-## 安裝
+### 安裝
 
 **需要 NodeJS 6.0.0 或更高的版本**  
 此外，使用 "npm install" 指令完成安裝所需的模塊:  
