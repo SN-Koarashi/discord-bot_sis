@@ -14,3 +14,6 @@ Besides, installation required module is done using the "npm install" command:
 
 `npm install discord.js`  
 `npm install mysql`
+
+File `db.sql` is the table settings, you need to import it to your database.
+文件 `db.sql` 為資料庫中所需的資料結構、設定，可直接使用 phpMyAdmin 或其他匯入資料庫中。
