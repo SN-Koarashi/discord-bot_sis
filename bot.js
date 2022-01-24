@@ -1,94 +1,148 @@
 const config = require("./config.json");
-const Discord = require('discord.js');
+const {Client, Intents} = require('discord.js');
 const mysql = require("mysql");
 
-var bot = new Discord.Client();
-var db = mysql.createConnection({
-    host: config.mysqlHost,
-    user: config.mysqlUser,
-    password: config.mysqlPass,
-    database: config.mysqlDB,
+const myIntents = new Intents();
+myIntents.add(
+	Intents.FLAGS.GUILDS, 
+	Intents.FLAGS.GUILD_MEMBERS,
+	Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
+	Intents.FLAGS.GUILD_MESSAGES,
+	Intents.FLAGS.GUILD_MESSAGE_REACTIONS
+);
+const bot = new Client({ intents: myIntents });
+
+const db = mysql.createPool({
+	connectionLimit: 10,
+    host: config.mysql.host,
+	port: config.mysql.port,
+    user: config.mysql.user,
+    password: config.mysql.password,
+    database: config.mysql.database,
 	charset: "utf8_unicode_ci"
 });
+
 bot.on('ready', () => {
-  console.log("Discord Bot is starting on "+config.version);
+  console.log(`Discord Bot Ready! ${config.version}`);
 });
 
 // Create an event listener for messages
-bot.on('message', message => {
-  if (message.channel.type != 'text') return;
-  if (message.content === '~getid') {
-	message.author.send("Your ID: "+message.member.id);
+bot.on('messageCreate', async message => {
+  // Escape function if conditional establishment following
+  const AccpetTypes = ['GUILD_TEXT','GUILD_NEWS','GUILD_PUBLIC_THREAD','GUILD_PRIVATE_THREAD'];
+  if(AccpetTypes.indexOf(message.channel.type) < 0 || !message.content || message.author.bot) return;
+
+  if (message.content === '!help') {
+    message.channel.send("Welcome to our Sign System!\nIf you cannot create account, please type `!create` to do it.\nView your sign in days `!check`\nSign in `!sign`\n\n"+config.version);
   }
-  if (message.content === '~help') {
-    message.channel.send("Welcome to our Sign System!\nIf you cannot create account, please type `~create` to do it.\nView your sign in days `~check`\nSign in `~sign`\n\n"+config.version);
+  if (message.content === '!check') {
+		const id = message.member.id;
+		try{
+			var sql = await query("SELECT date,day FROM discord WHERE dis_id=?",[id]);
+		}catch(err){
+			console.log(`[ERROR] unexpected error ${err}`);
+			return;
+		}
+		var row = sql[0];
+
+		if(row == null){
+			console.log(`[INFO] ${message.author.tag} have not create the account.`);
+			message.reply({content: 'You have not create the account.'});
+		}
+		else{
+			console.log(`[INFO] ${message.author.tag} has checked sign in information.`);
+			message.reply({content: 'Sign in Information\nSign in Total: '+row.day+' days\nLast Sign in Date: '+row.date});
+		}
   }
-  if (message.content === '~check') {
-			var id = message.member.id;
-			db.query("SELECT date,day FROM discord WHERE dis_id='"+id+"'",[],function(err,rows){
-				var obj = JSON.stringify(rows);
-				var obj = JSON.parse(obj);
-				if(obj[0] == null){
-					console.log('[INFO] CheckDB: '+id+' not create a account');
-					message.reply('You have not create account.');
-					return false;
+  if (message.content === '!create') {
+		const id = message.member.id;
+		let nowdate = getDateFormat();
+		
+		try{
+			var result = await query("INSERT INTO discord VALUES(NULL,?,'0',?)",[id,nowdate]);
+		}catch(err){
+			console.log(`[ERROR] unexpected error ${err}`);
+			return;
+		}
+		
+		if(result.affectedRows){
+			console.log(`[INFO] ${message.author.tag} has created the account.`);
+			message.reply({content: 'The account has created!'});
+		}
+		else{
+			console.log(`[WARN] ${message.author.tag} cannot create the account.`);
+			message.reply({content: 'The account have not create.'});
+		}
+  }
+  if (message.content === '!sign') {
+		const id = message.member.id;
+		try{
+			var sql = await query("SELECT date,day FROM discord WHERE dis_id=?",[id]);
+		}catch(err){
+			console.log(`[ERROR] unexpected error ${err}`);
+			return;
+		}
+		
+		var row = sql[0];
+		if(row == null){
+			console.log(`[INFO] ${message.author.tag} have not create the account.`);
+			message.reply({content: 'You have not create the account.'});
+		}
+		else{
+			let nowdate = getDateFormat();
+			if(nowdate == row.date){
+				console.log(`[INFO] ${message.author.tag} has already signed in.`);
+				message.reply({content: 'You has already signed in!'});
+			}
+			else{
+				try{
+					var result = await query("UPDATE discord SET day=?,date=? WHERE dis_id=?",[row.day*1+1,nowdate,id]);
+				}catch(err){
+					console.log(`[ERROR] unexpected error ${err}`);
+					return;
+				}
+				
+				if(result.affectedRows){
+					console.log(`[INFO] ${message.author.tag} has signed in successfuly.`);
+					message.reply({content: 'You has signed in successfuly!'});
 				}
 				else{
-					console.log('[INFO] CheckDB: '+id+' check sign in day on '+obj[0].day+' days, last sign in date: '+obj[0].date);
-					message.reply('Sign in Information\nSign in Total: '+obj[0].day+' days\nLast Sign in Date: '+obj[0].date);
+					console.log(`[WARN] ${message.author.tag} cannot sign in.`);
+					message.reply({content: 'Sign in failed!'});
 				}
-			});
-  }
-  if (message.content === '~create') {
-			var id = message.member.id;
-			var date = new Date();
-			var year = date.getFullYear()
-			var month = ('0'+(date.getMonth()*1+1)).substr(-2);
-			var day = ('0'+(date.getDate()*1-1)).substr(-2);
-			var now = year+'-'+month+'-'+day;
-			db.query("INSERT INTO discord VALUES(NULL,'"+id+"','0','"+now+"')",[],function(err,rows){
-				var msg = JSON.stringify(err);
-				if(msg != 'null'){
-					var obj = JSON.parse(msg);
-					console.log('[WARN] Create faild: '+id+'('+obj.errno+')');
-					message.reply('You already have account.');
-					return false;
-				}
-				console.log('[INFO] Success create at:'+id);
-				message.reply('Account create successfuly!');
-			});
-  }
-  if (message.content === '~sign') {
-			var id = message.member.id;
-			var date = new Date();
-			var year = date.getFullYear()
-			var month = ('0'+(date.getMonth()*1+1)).substr(-2);
-			var day = ('0'+date.getDate()).substr(-2);
-			var now = year+'-'+month+'-'+day;
-			db.query("SELECT date,day FROM discord WHERE dis_id='"+id+"'",[],function(err,rows){
-				var obj = JSON.stringify(rows);
-				var obj = JSON.parse(obj);
-				if(obj[0] == null){
-					console.log('[INFO] UpdateDB: '+id+' not create a account');
-					message.reply('You have not create account.');
-					return false;
-				}
-				else{
-					if(obj[0].date == now){
-						console.log('[INFO] UpdateDB: '+id+' sign in failed');
-						message.reply('You already have sign in today.');
-						return false;
-					}
-					else{
-						db.query("UPDATE discord SET day='"+(obj[0].day*1+1)+"',date='"+now+"' WHERE dis_id='"+id+"'",[],function(err,rows){
-							console.log('[INFO] UpdateDB: '+id+' sign in '+(obj[0].day*1+1)+' days successfuly');
-							message.reply('Sign in successfuly! You has been signed in '+(obj[0].day*1+1)+' days.');
-							return false;
-						});
-					}
-				}
-			});
+			}
+		}
   }
 });
+
+
+function getDateFormat(){
+	let date = new Date();
+	let year = date.getFullYear()
+	let month = ('0'+(date.getMonth()*1+1)).substr(-2);
+	let day = ('0'+(date.getDate()*1-1)).substr(-2);
+	
+	return year+'-'+month+'-'+day;
+}
+function query( sql, values ) {
+  return new Promise(( resolve, reject ) => {
+    db.getConnection(function(err, connection) {
+      if (err){
+        reject(err);
+      }
+	  else { 
+        connection.query(sql, values, ( err, rows) => {
+			if (err) 
+				reject(err);
+			else
+				resolve(rows);
+			
+			connection.release();
+        });
+      }
+    })
+  })
+};
+
 // Log our bot in using the token from https://discordapp.com/developers/applications/me
 bot.login(config.token);

@@ -1,9 +1,11 @@
 {
-  "token": "Your Bot TokenID",
-  "mysqlHost" : "localhost",
-  "mysqlUser" : "root",
-  "mysqlPass" : "",
-  "mysqlDB" : "database",
-  "version" : "v1.0.2",
-  "botAdminUserId" : "AdminID"
+  "token": "Bot Token",
+  "mysql": {
+	"host": "localhost",
+	"port": 3306,
+	"user": "root",
+	"password": "",
+	"database": "discord"
+  },
+  "version" : "v1.0.3"
 }

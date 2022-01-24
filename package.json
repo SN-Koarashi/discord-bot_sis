@@ -1,0 +1,14 @@
+{
+  "name": "Discord Sign In Bot",
+  "version": "2.0.0",
+  "description": "A simple discord bot.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "SNKms",
+  "license": "GPLv3",
+  "dependencies": {
+    "discord.js": "13.1.0",
+    "mysql": "2.18.1"
+  }
+}
