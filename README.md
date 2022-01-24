@@ -1,28 +1,24 @@
-# discord-bot_sis
+# Discord Sign in Bot
 ## English
 ### About
 A simple Discord Bot, let all of member to sign in for everyday!
 
 ### Installation
 
-**Node.js 6.0.0 or newer is required.**   
-Besides, installation required module is done using the "npm install" command:
+**Node.js 16.10.0 or newer is required.**   
 
-`npm install discord.js`  
-`npm install mysql`
-
-File `db.sql` is the table settings, you need to import it to your database.
+* Using `npm install` in directory to install required module.
+* Create database named `discord`.
+* Importing `db.sql` content in your database.
 
 ## 繁體中文
 ### 關於
-簡單的簽到系統，可讓會員們在你的伺服器進行每日簽到。
+簡單的簽到系統，可讓成員們在你的伺服器進行每日簽到。
 
 ### 安裝
 
-**需要 NodeJS 6.0.0 或更高的版本**  
-此外，使用 "npm install" 指令完成安裝所需的模塊:  
+**需要 NodeJS 16.10.0 或更高的版本**  
 
-`npm install discord.js`  
-`npm install mysql`
-
-文件 `db.sql` 為資料庫中所需的資料結構、設定，可直接使用 phpMyAdmin 或其他匯入資料庫中。
+* 在目錄中使用 `npm install` 來安裝所需的模組。
+* 在資料庫中建立名為 `discord` 的資料庫
+* 將檔案 `db.sql` 的內容匯入到剛剛創建的資料庫中
