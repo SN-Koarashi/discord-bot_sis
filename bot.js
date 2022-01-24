@@ -14,11 +14,11 @@ const bot = new Client({ intents: myIntents });
 
 const db = mysql.createPool({
 	connectionLimit: 10,
-    host: config.mysql.host,
+	host: config.mysql.host,
 	port: config.mysql.port,
-    user: config.mysql.user,
-    password: config.mysql.password,
-    database: config.mysql.database,
+	user: config.mysql.user,
+	password: config.mysql.password,
+	database: config.mysql.database,
 	charset: "utf8_unicode_ci"
 });
 
